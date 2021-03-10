@@ -1,4 +1,5 @@
 public class Hourly extends Worker{
+
     public Hourly(String name){
         super(name);
     }

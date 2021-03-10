@@ -1,4 +1,5 @@
 public class Fixed extends Worker{
+
     public Fixed(String name){
         super(name);
     }

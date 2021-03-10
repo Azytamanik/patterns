@@ -1,10 +1,12 @@
 public abstract class Worker {
-    private static int id = 0;
+
+    private static int memoryId = 0;
+    private final int personalId;
     private final String name;
     private double salary;
 
     public int getId() {
-        return id;
+        return personalId;
     }
 
     public String getName() {
@@ -20,7 +22,7 @@ public abstract class Worker {
     }
 
     public Worker(String name){
-        id = ++id;
+        this.personalId = ++memoryId;
         this.name = name;
     }
 
