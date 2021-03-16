@@ -1,15 +1,30 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 import static java.lang.System.out;
 
-public class ConsoleWorker {
+public class WorkerDepartment {
 
+    public static class SingletonHolder {
+        public static final WorkerDepartment HOLDER_INSTANCE = new WorkerDepartment();
+    }
+
+    public static WorkerDepartment getInstance() {
+        return SingletonHolder.HOLDER_INSTANCE;
+    }
+
+    File file = new File("output.txt");
     List<Worker> workers = new ArrayList<>();
     Worker worker;
     private boolean toContinue = true;
 
-    public ConsoleWorker(){
+    private WorkerDepartment() {
+        if (file.length() != 0){
+            FileManagement.reader(file, workers);
+
+            Worker lastID = workers.stream().max(Comparator.comparing(Worker::getId)).orElseThrow();
+            Worker.memoryDeserialize(lastID.getId());
+        }
         while (toContinue) {
             addWorker();
         }
@@ -20,9 +35,10 @@ public class ConsoleWorker {
         listPrint();
         fiveNames();
         threeIds();
+        FileManagement.writer(file, workers);
     }
 
-    public void addWorker(){
+    public void addWorker() {
         Scanner in = new Scanner(System.in);
         out.print("Worker's name: ");
         String name = in.nextLine();
@@ -54,60 +70,54 @@ public class ConsoleWorker {
 
         if (nextChoice.equalsIgnoreCase("yes")) {
             toContinue = true;
-        }
-        else if (nextChoice.equalsIgnoreCase("no")){
+        } else if (nextChoice.equalsIgnoreCase("no")) {
             toContinue = false;
-        }
-        else {
+        } else {
             System.exit(0);
         }
     }
 
-    public void listPrint(){
-        for (Worker w: workers) {
-            System.out.println("Id: " + w.getId() + "   Name: " + w.getName() + "   Salary: " + w.getSalary());
+    public void listPrint() {
+        for (Worker w : workers) {
+            System.out.println("Id: " + w.getId() + "   Name: " + w.getName()
+                    + "   Salary: " + w.getSalary() + w.workerInfo());
         }
     }
 
-    public void listSort(){
-        for (int i = 0; i < workers.size() - 1; i++){
-            Worker max = workers.get(i);
-            int iMax = i;
-            for (int j = i; j < workers.size(); j++){
-                if (max.getSalary() < workers.get(j).getSalary()){
-                    max = workers.get(j);
-                    iMax = j;
-                } else if (max.getSalary() == workers.get(j).getSalary()){
-                    int lexicographic = max.getName().compareTo(workers.get(j).getName());
-                    if (lexicographic > 0){
-                        max = workers.get(j);
-                        iMax = j;
-                    }
-                }
-            }
-            workers.remove(iMax);
-            workers.add(i, max);
-        }
+    public void listSort() {
+        workers = workers.stream()
+                .sorted(Comparator.comparing(Worker::getSalary).reversed().thenComparing(Worker::getName))
+                .collect(Collectors.toList());
     }
 
-    public void fiveNames(){
+    public void fiveNames() {
+        int j = 0;
+
         if ((workers.size() < 5)) {
             out.printf("There are only %d workers!\n", workers.size());
         } else {
             out.println("First five names:");
         }
-        for (Worker w: workers) {
+
+        for (Worker w : workers) {
             out.println(w.getName());
-            if (w.getId() == 4){
+            j++;
+            if (j == 5) {
                 break;
             }
         }
     }
 
-    public void threeIds(){
-        out.printf("Last %d id values: \n", Math.max(workers.size() - 3, 0));
+    public void threeIds() {
+        if ((workers.size() < 3)) {
+            out.printf("There are only %d workers!\n", workers.size());
+        } else {
+            out.println("Last three id values:");
+        }
+
         List<Worker> lastWorkers = workers.subList(Math.max(workers.size() - 3, 0), workers.size());
-        for (Worker w: lastWorkers) {
+
+        for (Worker w : lastWorkers) {
             out.println(w.getId());
         }
     }

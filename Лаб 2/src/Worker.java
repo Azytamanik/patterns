@@ -1,24 +1,22 @@
-public abstract class Worker {
+import java.io.Serializable;
+
+public abstract class Worker implements Serializable {
 
     private static int memoryId = 0;
     private final int personalId;
     private final String name;
     private double salary;
 
-    public int getId() {
-        return personalId;
-    }
+    public int getId() { return personalId; }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
-    public double getSalary() {
-        return salary;
-    }
+    public double getSalary() { return salary; }
 
-    public void setSalary(double salary) {
-        this.salary = salary;
+    public void setSalary(double salary) { this.salary = salary; }
+
+    public static void memoryDeserialize(int lastId){
+        memoryId = lastId;
     }
 
     public Worker(String name){
@@ -27,4 +25,5 @@ public abstract class Worker {
     }
 
     public abstract void salaryCalculation(double wage_rate);
+    public abstract String workerInfo();
 }
